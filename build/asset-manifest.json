@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/EzCompus/static/css/main.69b53336.chunk.css",
-    "main.js": "/EzCompus/static/js/main.b944dda0.chunk.js",
-    "main.js.map": "/EzCompus/static/js/main.b944dda0.chunk.js.map",
+    "main.js": "/EzCompus/static/js/main.2a6aef46.chunk.js",
+    "main.js.map": "/EzCompus/static/js/main.2a6aef46.chunk.js.map",
     "runtime-main.js": "/EzCompus/static/js/runtime-main.bd3d6912.js",
     "runtime-main.js.map": "/EzCompus/static/js/runtime-main.bd3d6912.js.map",
     "static/css/2.4d88e704.chunk.css": "/EzCompus/static/css/2.4d88e704.chunk.css",
@@ -19,6 +19,6 @@
     "static/css/2.4d88e704.chunk.css",
     "static/js/2.a6d923e2.chunk.js",
     "static/css/main.69b53336.chunk.css",
-    "static/js/main.b944dda0.chunk.js"
+    "static/js/main.2a6aef46.chunk.js"
   ]
 }
