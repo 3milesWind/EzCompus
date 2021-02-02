@@ -46,12 +46,12 @@ function App() {
                     <Switch>
                       <Route
                         exact
-                        path="/"
+                        path="EzCompus/"
                         component={() => {
                           return (
                             <Redirect
                               to={{
-                                pathname: "/posts",
+                                pathname: "EzCompus/posts",
                               }}
                             >
                             </Redirect>
@@ -60,7 +60,7 @@ function App() {
                       />
                       <Route
                         exact
-                        path="/profile"
+                        path="EzCompus/profile"
                         component={UserProfile}
                       />
                       <Route
