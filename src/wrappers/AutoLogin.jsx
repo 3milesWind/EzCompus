@@ -1,0 +1,74 @@
+import React, {useEffect} from 'react'
+import store from '../store/Store'
+import axios from 'axios'
+import {useHistory} from 'react-router-dom'
+import API_PREFIX from '../API_PREFIX'
+
+export default function AutoLogin(props) {
+    const children = props.children
+    const history = useHistory()
+
+    useEffect(() => {
+        const userEmail = localStorage.getItem('ezcampus_user_email')
+        const password = localStorage.getItem('ezcampus_user_password')
+
+        if (userEmail && password) {
+            autoLogin(userEmail, password)
+        }
+
+        const unsubscribe = store.subscribe(() => {
+            setTimeout(() => {
+                const {isLoggedIn} = store.getState()
+                if (!isLoggedIn) {
+                    if (history.location.pathname === '/contacts' ||
+                        history.location.pathname === '/posts/my') {
+                        history.replace('/posts')
+                    }
+                }
+            }, 200)
+        
+        })
+
+        return () => {unsubscribe()}
+
+    }, [])
+
+    const autoLogin = (userEmail, password) => {
+        const action = {type: 'setIsLoading', data: {isLoading: true}}
+        store.dispatch(action)
+        axios.post(`${API_PREFIX}/users/email_login`, {
+            'email': userEmail,
+            'password': password
+            
+        })
+        .then(res => {
+            if (res.data.statusCode === 200) {
+                const action = {
+                    type: 'setEmailAndUserName',
+                    data: {
+                        email: res.data.user.email,
+                        userName: res.data.user.userName,
+                        avatarlink: res.data.user.avatarlink,
+                        isLoading: false
+                    }
+                }
+                store.dispatch(action) 
+            }
+        })
+        .catch(err => {
+            const action = {
+                type: 'setIsLoading',
+                data: {
+                    isLoading: false
+                }
+            }
+            store.dispatch(action)
+        })
+    }
+
+    return (
+        <div>
+            {children}
+        </div>
+    )
+}

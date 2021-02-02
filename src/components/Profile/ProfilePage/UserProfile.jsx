@@ -1,0 +1,249 @@
+import React from "react";
+import styled from "styled-components";
+import BigProfile from "../icons/BigProfile.png";
+import axios from 'axios';
+import { Button, Card } from "antd";
+import contactIcon from "../icons/group.png";
+import { EditOutlined} from "@ant-design/icons";
+import { Redirect } from "react-router-dom";
+import store from '../../../store/Store';
+import API_PREFIX from '../../../API_PREFIX'
+
+class UserProfile extends React.Component {
+  constructor(props) {
+    super(props)
+    this.history = props.history
+  }
+  state={
+    redirect: false,
+    profile:{}
+  }
+
+  componentDidMount() {
+    
+    let interval = setInterval(() => {
+        const {isLoading} = store.getState()
+        if (!isLoading) {
+          clearInterval(interval)
+          const {isLoggedIn} = store.getState()
+          if (!isLoggedIn) {
+            const action = {type: 'setShowPromptLogIn'}
+            store.dispatch(action)
+            this.history.push('/posts')
+          }
+        }
+    }, 5)
+
+    store.subscribe(() => {
+        let interval = setInterval(() => {
+          const {isLoading} = store.getState()
+          if (!isLoading) {
+            clearInterval(interval)
+            const {isLoggedIn} = store.getState()
+            if (!isLoggedIn) {
+              this.history.push('/posts')
+          }
+          }
+
+        }, 5)
+    })
+
+    let loadUserInterval = setInterval(() => {
+          const {isLoading} = store.getState()
+          if (!isLoading) {
+            clearInterval(loadUserInterval)
+            const {email} = store.getState()
+            axios.get(`${API_PREFIX}/users/profile/get`, {params: {email}})
+            .then(res =>{
+              if(res.data.statusCode === 200){
+                this.setState({
+                  profile:res.data.profile
+                },() =>{
+                })
+              }
+            })
+            
+          }
+    }, 5)
+    
+  }
+  
+  renderRedirect = () => {
+    if (this.state.redirect) {
+      return <Redirect to="/profile/settings" />;
+    }
+  };
+  render() {
+    return (
+      <FullPageContainer>
+        <ProfileContainer>
+            {this.renderRedirect()}
+            <Card
+            style ={{width:"60%"}}
+              headStyle={{ background: "#DEE0EB" }}
+              extra={
+                <Button
+                  style={styles.editButton}
+                  onClick={
+                  
+                    (this.setRedirect = () => {
+                      this.setState({
+                        redirect: true
+                      });
+                    })
+                  }
+                >
+                  <EditOutlined />
+                </Button>
+              }
+            >
+              <div style={styles.avatar}>
+              {!this.state.profile.avatarlink ?
+                  <AvatarImage
+                    src={BigProfile}
+                  >
+                  </AvatarImage>  :
+                  <AvatarImage
+                  src={this.state.profile.avatarlink}
+                  ></AvatarImage>
+              }
+              </div>
+              <div style={styles.nameText}>
+                <Name>{this.state.profile.userName}</Name>
+              </div>
+              {this.state.profile.city || this.state.profile.state?
+                <div style={styles.positionText}>
+                  <Name>{this.state.profile.city}</Name>
+                  <Name>{this.state.profile.state}</Name>
+                </div> : null
+              }
+            <div>
+                <TitleField>
+                  <img
+                    src={contactIcon}
+                    alt="contact"
+                    style={{ width: 23, height: 23, marginRight: 10 }}
+                  ></img>
+                  About Me
+                </TitleField>
+                <div style={styles.fieldText}>
+                    {this.state.profile.aboutMe}
+                </div>
+            </div>
+            <div>
+                <TitleField>
+                  <img
+                    src={contactIcon}
+                    alt="contact"
+                    style={{ width: 23, height: 23, marginRight: 10 }}
+                  ></img>
+                  Contact Info
+                </TitleField>
+                <div style={styles.fieldText}>
+                  Contact Email:
+                  <div style={styles.text}>
+                    {this.state.profile.contactEmail}
+                  </div>
+                </div>
+                <div style={styles.fieldText}>
+                  Phone:
+                  <div style={styles.text}>
+                    {this.state.profile.phone}
+                  </div>
+                </div>
+              </div>
+            </Card>
+        </ProfileContainer>
+      </FullPageContainer>
+    )
+  }
+}
+
+
+const Name = styled.div`
+  display: inline-block;
+  margin: 0 5px 0 5px;
+  font-family: BasicSans;
+`;
+
+const AvatarImage = styled.img`
+  width: 78px;
+  height: 78px;
+  border-radius: 39px;
+`;
+
+const TitleField = styled.div`
+  font-size: 25px;
+  display: flex;
+  align-items: center;
+  line-height: 24px;
+  font: BasicSans;
+  letter-spacing: 0;
+  margin-top: 15px;
+  color: #545871;
+  opacity: 1;
+  word-break: break-word;
+`;
+const ProfileContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+  justify-content: space-around;
+  height: 100vh;
+`;
+const FullPageContainer = styled.div`
+    background-color: #f5f6fa;
+    width: 100%;
+`;
+
+const styles = {
+  avatar: {
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center"
+  },
+  text:{
+    display: "inline-block",
+    fontSize:"20px",
+    marginLeft: "30px",
+    color: "#666774", 
+  },
+  fieldText:{
+    color: "#666774", 
+    marginTop: "5px", 
+    fontSize:"20px"
+  },
+  editButton: {
+    cursor: "pointer",
+    textAlign: "center",
+    color: "#ffffff",
+    fontSize: "20px",
+    backgroundColor: "#545871",
+    borderRadius: "3px",
+    height: "36px",
+    width: "36px",
+    border: "0px",
+    padding: "0px"
+  },
+  nameText: {
+    fontFamily: "Ubuntu",
+    fontSize: "35px",
+    fontWeight: "bold",
+    textAlign: "center",
+    color: "#545871",
+    width: "100%",
+    paddingTop: "5px"
+  },
+  positionText: {
+    fontFamily: "Ubuntu",
+    fontSize: "20px",
+    fontWeight: "bold",
+    textAlign: "center",
+    color: "#545871",
+    width: "100%",
+    paddingTop: "5px"
+  }
+}
+
+
+export default UserProfile;
